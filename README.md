@@ -1,5 +1,10 @@
 # somchai-adventure
-somchai-adventure monogame 2d-Side Scroller Puzzle Adventure 1-bit pixel art
+somchai-adventure | monogame | 2d-Side Scroller Puzzle Adventure 1-bit pixel art | no library require
+
+# Desisng Pattern use In Game
+Singleton (Singleton.cs)
+Prototype (GameObjects.cs)
+state (switch case in MainScene.cs)
 
 # DEMO
 [DEMO-VDO](https://www.youtube.com/watch?v=iL0WJMVtsf0)
