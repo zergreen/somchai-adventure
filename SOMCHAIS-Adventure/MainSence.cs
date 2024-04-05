@@ -28,7 +28,7 @@ namespace SOMCHAIS_Adventure
 
         private const int numberOfLevels = 5;
 
-        public Texture2D _bg, _howtoplay, _endgame, _overlay, _map;
+        public Texture2D _bg, _howtoplay, _howtoplay2, _howtoplay3, _howtoplay4, _endgame, _overlay, _map;
         public Texture2D gameSprite;
 
         public int screenWidth = Singleton.SCREENWIDTH;
@@ -36,12 +36,15 @@ namespace SOMCHAIS_Adventure
 
         // Green Define HUD
         TimeSpan currentTime;
-        bool isMap = false, isHowToplay = false, debug = false;
+        bool isMap = false, debug = false;
 
         // Camera properties
         private Vector2 cameraPosition;
         private Vector2 targetCameraPosition;
         private float cameraLerpFactor = 0.1f; // Adjust this value to control the smoothing amount
+
+        int currentMenuIndex = 0; // Initialize the current menu index to 0
+        //int menuIndexIsOne = 1;
 
         public MainSence()
         {
@@ -71,6 +74,9 @@ namespace SOMCHAIS_Adventure
             _bg = Content.Load<Texture2D>("bg/factory");
 
             _howtoplay = Content.Load<Texture2D>("Overlay/HowToPlay");
+            _howtoplay2 = Content.Load<Texture2D>("Overlay/HowToPlay2");
+            _howtoplay3 = Content.Load<Texture2D>("Overlay/HowToPlay3");
+            _howtoplay4 = Content.Load<Texture2D>("Overlay/HowToPlay4");
             _endgame = Content.Load<Texture2D>("Overlay/GameEnding");
             _overlay = Content.Load<Texture2D>("Overlay/overlay");
             _map = Content.Load<Texture2D>("Overlay/Map");
@@ -159,12 +165,18 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.GameOver;
                     }
 
+                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.H) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
+                    }
+
                     // UPDATE: Tiles Level
                     Singleton.Instance.level.Update();
 
                     break;
 
                 case Singleton.GameState.GameOver:
+
                     if (!Singleton.Instance.CurrentKey.Equals(Singleton.Instance.PreviousKey) && Singleton.Instance.CurrentKey.GetPressedKeys().Length > 0)
                     {
                         //any keys pressed to start
@@ -172,6 +184,66 @@ namespace SOMCHAIS_Adventure
                         Reset();
                         Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
                     }
+                    break;
+
+                  
+
+                case Singleton.GameState.Tutorial:
+                    KeyboardState currentKeyState = Keyboard.GetState();
+                    Keys[] pressedKeys = currentKeyState.GetPressedKeys();
+                    
+
+                    // If no keys are pressed or the current key state is different from the previous key state
+                    if (pressedKeys.Length == 0 || !currentKeyState.Equals(Singleton.Instance.PreviousKey))
+                    {
+                        // Update the menu based on the current menu index
+
+                        // Update the previous key state
+                        Singleton.Instance.PreviousKey = currentKeyState;
+
+                        // Handle arrow key presses
+                        switch (pressedKeys.Length)
+                        {
+                            case 0:
+                                // No keys pressed
+                                break;
+                            case 1:
+                                Keys pressedKey = pressedKeys[0];
+                                switch (pressedKey)
+                                {
+                                    case Keys.H:
+                                        menu[i] = 0;
+                                        Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
+                                        break;
+
+                                    case Keys.Down:
+                                        // Handle down arrow key press
+                                        break;
+                                    case Keys.Left:
+                                        // Move to the previous menu
+                                        currentMenuIndex = Math.Max(0, currentMenuIndex - 1);
+                                        Singleton.Instance.messageLog.AddMessage(currentMenuIndex.ToString(), gameTime);
+                                        menu[i] = currentMenuIndex;
+                                        break;
+                                    case Keys.Right:
+                                        // Move to the next menu
+                                        currentMenuIndex = Math.Min(4, currentMenuIndex + 1);
+                                        Singleton.Instance.messageLog.AddMessage(currentMenuIndex.ToString(), gameTime);
+                                        menu[i] = currentMenuIndex;
+                                        break;
+                                }
+                                break;
+                            default:
+                                // Multiple keys pressed
+                                menu[currentMenuIndex] = 0;
+                                //isHowToplay = false;
+                                Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
+                                break;
+                        }
+                    }
+
+                    
+
                     break;
 
                 case Singleton.GameState.GameWin:
@@ -198,7 +270,10 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
                     }
                     break;
+                
             }
+
+
 
             // Debug Zone
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
@@ -213,8 +288,7 @@ namespace SOMCHAIS_Adventure
                     Reset();
                 }
 
-                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-                    isHowToplay = !isHowToplay;
+               
 
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     Singleton.Instance.CurrentGameState = Singleton.GameState.GameWin;
@@ -244,6 +318,9 @@ namespace SOMCHAIS_Adventure
 
             base.Update(gameTime);
         }
+
+        int i = 0;
+        int[] menu = { 0, 1, 2, 3,4 };
 
         protected override void Draw(GameTime gameTime)
         {
@@ -370,10 +447,26 @@ namespace SOMCHAIS_Adventure
                 _spriteBatch.DrawString(_font, "Level " + Singleton.Instance.levelIndex, new Vector2(100, 100), Color.Red);
             }
 
-            if (isHowToplay)
+            if (Singleton.Instance.CurrentGameState == Singleton.GameState.Tutorial)
             {
                 _spriteBatch.Draw(_howtoplay, Vector2.Zero, Color.White); // heart
             }
+
+            if (menu[i] == 2)
+            {
+                _spriteBatch.Draw(_howtoplay2, Vector2.Zero, Color.White); // heart
+            }
+
+            if (menu[i] == 3)
+            {
+                _spriteBatch.Draw(_howtoplay3, Vector2.Zero, Color.White); // heart
+            }
+
+            if (menu[i] == 4)
+            {
+                _spriteBatch.Draw(_howtoplay4, Vector2.Zero, Color.White); // heart
+            }
+
 
             if (Singleton.Instance.CurrentGameState == Singleton.GameState.GameWin)
             {

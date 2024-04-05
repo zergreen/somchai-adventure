@@ -22,7 +22,8 @@ namespace SOMCHAIS_Adventure
             StartNewLife,
             GamePlaying,
             GameOver,
-            GameWin
+            Tutorial,
+            GameWin,
         }
 
         public GameState CurrentGameState;

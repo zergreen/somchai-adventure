@@ -59,7 +59,7 @@ namespace SOMCHAISAdventure.GameObjects
             PositionHud.X = Position.X + 16;
             PositionHud.Y = Position.Y - 16;
 
-            if (Life == 0)
+            if (Life <= 0)
             {
                 IsActive = false;
 
