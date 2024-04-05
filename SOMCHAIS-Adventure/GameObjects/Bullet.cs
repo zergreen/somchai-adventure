@@ -145,16 +145,17 @@ namespace SOMCHAIS_Adventure
                 {
                     // If this tile is collidable,
                     TileCollision collision = Singleton.Instance.level.GetCollision(x, y);
-                    if (collision != TileCollision.Passable)
+                    if (collision == TileCollision.Impassable)
                     {
-                        // Determine collision depth (with direction) and magnitude.
+                        isHit = true;
+                        /* Determine collision depth (with direction) and magnitude.
                         Rectangle tileBounds = Singleton.Instance.level.GetBounds(x, y);
                         Vector2 depth = RectangleExtensions.GetIntersectionDepth(bounds, tileBounds);
                         if (depth != Vector2.Zero)
                         {
                             isHit = true; // Set the variable to true when a collision occurs
                             break; // Exit the loop since we've detected a collision
-                        }
+                        }*/
                     }
                 }
                 if (isHit)

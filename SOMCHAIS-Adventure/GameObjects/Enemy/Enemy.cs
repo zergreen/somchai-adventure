@@ -55,7 +55,7 @@ namespace SOMCHAIS_Adventure
         public override void Update(GameTime gameTime, List<GameObject> gameObjects)
         {
             #region begin deplay feature
-            if (Life == 0 && !delayActive)
+            if (Life <= 0 && !delayActive)
             {
                 delayActive = true;
                 delay = 1f; // 1 seconds delay
@@ -104,6 +104,7 @@ namespace SOMCHAIS_Adventure
                     }
                 }
             }
+
 
             HandleCollisions();
 

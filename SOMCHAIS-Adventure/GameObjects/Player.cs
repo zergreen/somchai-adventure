@@ -155,13 +155,13 @@ namespace SOMCHAIS_Adventure
                 SoundEffect.Play();
             }
 
-            if (Singleton.Instance.isCunning && Singleton.Instance.CurrentKey.IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            if (Singleton.Instance.isCunning && Singleton.Instance.CurrentKey.IsKeyDown(Keys.H) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 swap = !swap;
             }
 
             // FEATURE: Dig Tile
-            if (Singleton.Instance.isDig && Singleton.Instance.CurrentKey.IsKeyDown(Keys.LeftShift) && Singleton.Instance.PreviousKey != Singleton.Instance.CurrentKey)
+            if (Singleton.Instance.isDig && Singleton.Instance.CurrentKey.IsKeyDown(Keys.Q) && Singleton.Instance.PreviousKey != Singleton.Instance.CurrentKey)
             {
                 Singleton.Instance.level.tiles[posX, posY] = new Tile(null, TileCollision.Passable);
             }
@@ -375,7 +375,7 @@ namespace SOMCHAIS_Adventure
                             Singleton.Instance.isDig = true;
                             Singleton.Instance.level.tiles[10, 26] = new Tile(null, TileCollision.Passable); // dig skill pos
                             Singleton.Instance.messageLog.AddMessage("Acquired: Dig Skill", gameTime);
-                            Singleton.Instance.messageLog.AddMessage("[SHORTCUT] Press Left-Shift For Dig", gameTime);
+                            Singleton.Instance.messageLog.AddMessage("[SHORTCUT] Press Q For Dig", gameTime);
                         }
                     }
 
@@ -404,6 +404,7 @@ namespace SOMCHAIS_Adventure
                         if (!Singleton.Instance.isSkillDefected && Vector2.Distance(Position, new Vector2(1000, 2000)) < 1000)
                         {
                             Singleton.Instance.messageLog.AddMessage("[DANGER] Not Allow to this Area", gameTime);
+                            Singleton.Instance.messageLog.AddMessage("[GUIDE] Acquire Indefect Skill On Level 2,first", gameTime);
                             Singleton.Instance.life = 0;
                         }
                     }
@@ -460,7 +461,7 @@ namespace SOMCHAIS_Adventure
                     }
 
                     {
-                        if (swap && Vector2.Distance(Position, new Vector2(2480, 415)) < 5)
+                        if (swap && Vector2.Distance(Position, new Vector2(2480, 415)) < 10)
                         {
                             Singleton.Instance.messageLog.AddMessage("[HINT] TRY TO DIG", gameTime);
                         }
@@ -474,7 +475,7 @@ namespace SOMCHAIS_Adventure
                 case 3:
                     {
                         //ACQUIRED: Cunning Skill.
-                        if (Vector2.Distance(Position, new Vector2(3000, 0)) < 5)
+                        if (Vector2.Distance(Position, new Vector2(3000, 0)) < 10)
                         {
                             Singleton.Instance.messageLog.AddMessage("[ACQUIRED] Cunning Skill", gameTime);
                             Singleton.Instance.messageLog.AddMessage("[SHORTCUT] Press Enter to toggle activate", gameTime);

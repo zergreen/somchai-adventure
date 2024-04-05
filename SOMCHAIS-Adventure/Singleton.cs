@@ -65,6 +65,7 @@ namespace SOMCHAIS_Adventure
 
         public int playerDeadCount = 0;
 
+
         public static Singleton Instance
 
         {

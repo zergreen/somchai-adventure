@@ -212,11 +212,14 @@ namespace SOMCHAISAdventure.GameObjects
 
         public void Update()
         {
+            reachedExit = false;
+
             // FEATURE: Player move to exit door
             if (Vector2.Distance(Singleton.Instance.Player.Position, new Vector2(exit.X, exit.Y)) < 20) // Assuming 20 unit is close enough
             {
                 OnExitReached();
             }
+
         }
 
 

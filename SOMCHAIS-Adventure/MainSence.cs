@@ -28,7 +28,9 @@ namespace SOMCHAIS_Adventure
 
         private const int numberOfLevels = 5;
 
-        public Texture2D _bg, _howtoplay, _howtoplay2, _howtoplay3, _howtoplay4, _endgame, _overlay, _map;
+        public Texture2D _bg, _endgame, _overlay, _map;
+        private Texture2D[] _tutorials;
+        int i = 0;
         public Texture2D gameSprite;
 
         public int screenWidth = Singleton.SCREENWIDTH;
@@ -46,6 +48,8 @@ namespace SOMCHAIS_Adventure
         int currentMenuIndex = 0; // Initialize the current menu index to 0
         //int menuIndexIsOne = 1;
 
+        bool keepEnterOnceTime = false;
+        
         public MainSence()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -73,13 +77,17 @@ namespace SOMCHAIS_Adventure
 
             _bg = Content.Load<Texture2D>("bg/factory");
 
-            _howtoplay = Content.Load<Texture2D>("Overlay/HowToPlay");
-            _howtoplay2 = Content.Load<Texture2D>("Overlay/HowToPlay2");
-            _howtoplay3 = Content.Load<Texture2D>("Overlay/HowToPlay3");
-            _howtoplay4 = Content.Load<Texture2D>("Overlay/HowToPlay4");
             _endgame = Content.Load<Texture2D>("Overlay/GameEnding");
             _overlay = Content.Load<Texture2D>("Overlay/overlay");
             _map = Content.Load<Texture2D>("Overlay/Map");
+
+            _tutorials = new Texture2D[10];
+
+            for (int i = 0; i < _tutorials.Length; i++)
+            {
+                _tutorials[i] = Content.Load<Texture2D>($"Tutorials/{i+1}");
+
+            }
 
             Singleton.Instance.messageLog = new MessageLog(10, new Vector2(10, 10), _font);
 
@@ -165,7 +173,7 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.GameOver;
                     }
 
-                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.H) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
                         Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
                     }
@@ -192,11 +200,9 @@ namespace SOMCHAIS_Adventure
                     KeyboardState currentKeyState = Keyboard.GetState();
                     Keys[] pressedKeys = currentKeyState.GetPressedKeys();
                     
-
                     // If no keys are pressed or the current key state is different from the previous key state
                     if (pressedKeys.Length == 0 || !currentKeyState.Equals(Singleton.Instance.PreviousKey))
                     {
-                        // Update the menu based on the current menu index
 
                         // Update the previous key state
                         Singleton.Instance.PreviousKey = currentKeyState;
@@ -211,32 +217,25 @@ namespace SOMCHAIS_Adventure
                                 Keys pressedKey = pressedKeys[0];
                                 switch (pressedKey)
                                 {
-                                    case Keys.H:
-                                        menu[i] = 0;
+                                    case Keys.Enter:
+                                        keepEnterOnceTime = true;
                                         Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
                                         break;
 
-                                    case Keys.Down:
-                                        // Handle down arrow key press
-                                        break;
                                     case Keys.Left:
                                         // Move to the previous menu
                                         currentMenuIndex = Math.Max(0, currentMenuIndex - 1);
-                                        Singleton.Instance.messageLog.AddMessage(currentMenuIndex.ToString(), gameTime);
-                                        menu[i] = currentMenuIndex;
+                                        i = currentMenuIndex;
                                         break;
                                     case Keys.Right:
                                         // Move to the next menu
-                                        currentMenuIndex = Math.Min(4, currentMenuIndex + 1);
-                                        Singleton.Instance.messageLog.AddMessage(currentMenuIndex.ToString(), gameTime);
-                                        menu[i] = currentMenuIndex;
+                                        currentMenuIndex = Math.Min(9, currentMenuIndex + 1);
+                                        i = currentMenuIndex;
+
                                         break;
                                 }
                                 break;
                             default:
-                                // Multiple keys pressed
-                                menu[currentMenuIndex] = 0;
-                                //isHowToplay = false;
                                 Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
                                 break;
                         }
@@ -319,8 +318,7 @@ namespace SOMCHAIS_Adventure
             base.Update(gameTime);
         }
 
-        int i = 0;
-        int[] menu = { 0, 1, 2, 3,4 };
+       
 
         protected override void Draw(GameTime gameTime)
         {
@@ -417,6 +415,11 @@ namespace SOMCHAIS_Adventure
             // own dead count hud
             _spriteBatch.Draw(gameSprite, new Vector2(0, 352), new Rectangle(0, 768, 32, 32), Color.White);
             _spriteBatch.DrawString(_font, String.Format("{0}", Singleton.Instance.playerDeadCount), new Vector2(32, 352), Color.Red);
+
+            if (!keepEnterOnceTime)
+            {
+                _spriteBatch.Draw(gameSprite, new Vector2(0, 0), new Rectangle(64, 912, 64, 32), Color.White);
+            }
             #endregion
 
             #region OVERLAY
@@ -447,25 +450,16 @@ namespace SOMCHAIS_Adventure
                 _spriteBatch.DrawString(_font, "Level " + Singleton.Instance.levelIndex, new Vector2(100, 100), Color.Red);
             }
 
-            if (Singleton.Instance.CurrentGameState == Singleton.GameState.Tutorial)
+            // NORMAL: TUTORIAL
+            switch (Singleton.Instance.CurrentGameState)
             {
-                _spriteBatch.Draw(_howtoplay, Vector2.Zero, Color.White); // heart
+                case Singleton.GameState.Tutorial:
+                    
+                    _spriteBatch.Draw(_tutorials[i], Vector2.Zero, Color.White);
+
+                    break;
             }
 
-            if (menu[i] == 2)
-            {
-                _spriteBatch.Draw(_howtoplay2, Vector2.Zero, Color.White); // heart
-            }
-
-            if (menu[i] == 3)
-            {
-                _spriteBatch.Draw(_howtoplay3, Vector2.Zero, Color.White); // heart
-            }
-
-            if (menu[i] == 4)
-            {
-                _spriteBatch.Draw(_howtoplay4, Vector2.Zero, Color.White); // heart
-            }
 
 
             if (Singleton.Instance.CurrentGameState == Singleton.GameState.GameWin)
@@ -508,6 +502,7 @@ namespace SOMCHAIS_Adventure
                 Vector2 iamuPosition = new Vector2(screenWidth / 2, screenHeight / 2);
                 _spriteBatch.DrawString(_font, "I am You From The F U T U R E!!!", iamuPosition, Color.Red, 0, _font.MeasureString("I am You From The F U T U R E!!!") / 2, 2.0f, SpriteEffects.None, 0);
             }
+
 
             Singleton.Instance.messageLog.Draw(_spriteBatch, gameTime);
 
