@@ -49,7 +49,7 @@ namespace SOMCHAIS_Adventure
         //int menuIndexIsOne = 1;
 
         bool keepEnterOnceTime = false;
-        
+
         public MainSence()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -85,7 +85,7 @@ namespace SOMCHAIS_Adventure
 
             for (int i = 0; i < _tutorials.Length; i++)
             {
-                _tutorials[i] = Content.Load<Texture2D>($"Tutorials/{i+1}");
+                _tutorials[i] = Content.Load<Texture2D>($"Tutorials/{i + 1}");
 
             }
 
@@ -111,9 +111,6 @@ namespace SOMCHAIS_Adventure
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             Singleton.Instance.CurrentKey = Keyboard.GetState();
             _numObject = _gameObjects.Count;
 
@@ -167,13 +164,13 @@ namespace SOMCHAIS_Adventure
                         Reset();
                     }
 
-                    if (Singleton.Instance.life == 0)
+                    if (Singleton.Instance.life <= 0)
                     {
                         Singleton.Instance.playerDeadCount++;
                         Singleton.Instance.CurrentGameState = Singleton.GameState.GameOver;
                     }
 
-                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
                         Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
                     }
@@ -194,55 +191,24 @@ namespace SOMCHAIS_Adventure
                     }
                     break;
 
-                  
-
                 case Singleton.GameState.Tutorial:
-                    KeyboardState currentKeyState = Keyboard.GetState();
-                    Keys[] pressedKeys = currentKeyState.GetPressedKeys();
-                    
-                    // If no keys are pressed or the current key state is different from the previous key state
-                    if (pressedKeys.Length == 0 || !currentKeyState.Equals(Singleton.Instance.PreviousKey))
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
-
-                        // Update the previous key state
-                        Singleton.Instance.PreviousKey = currentKeyState;
-
-                        // Handle arrow key presses
-                        switch (pressedKeys.Length)
-                        {
-                            case 0:
-                                // No keys pressed
-                                break;
-                            case 1:
-                                Keys pressedKey = pressedKeys[0];
-                                switch (pressedKey)
-                                {
-                                    case Keys.Enter:
-                                        keepEnterOnceTime = true;
-                                        Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
-                                        break;
-
-                                    case Keys.Left:
-                                        // Move to the previous menu
-                                        currentMenuIndex = Math.Max(0, currentMenuIndex - 1);
-                                        i = currentMenuIndex;
-                                        break;
-                                    case Keys.Right:
-                                        // Move to the next menu
-                                        currentMenuIndex = Math.Min(9, currentMenuIndex + 1);
-                                        i = currentMenuIndex;
-
-                                        break;
-                                }
-                                break;
-                            default:
-                                Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
-                                break;
-                        }
+                        keepEnterOnceTime = true;
+                        Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
                     }
-
-                    
-
+                    if (Keyboard.GetState().IsKeyDown(Keys.Left) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        // Move to the previous menu
+                        currentMenuIndex = Math.Max(0, currentMenuIndex - 1);
+                        i = currentMenuIndex;
+                    }
+                    if (Keyboard.GetState().IsKeyDown(Keys.Right) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        // Move to the next menu
+                        currentMenuIndex = Math.Min(9, currentMenuIndex + 1);
+                        i = currentMenuIndex;
+                    }
                     break;
 
                 case Singleton.GameState.GameWin:
@@ -269,10 +235,8 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
                     }
                     break;
-                
+
             }
-
-
 
             // Debug Zone
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
@@ -286,8 +250,6 @@ namespace SOMCHAIS_Adventure
                     ReloadCurrentLevel();
                     Reset();
                 }
-
-               
 
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     Singleton.Instance.CurrentGameState = Singleton.GameState.GameWin;
@@ -317,8 +279,6 @@ namespace SOMCHAIS_Adventure
 
             base.Update(gameTime);
         }
-
-       
 
         protected override void Draw(GameTime gameTime)
         {
@@ -390,12 +350,12 @@ namespace SOMCHAIS_Adventure
 
             if (Singleton.Instance.isCunning)
             {
-                _spriteBatch.Draw(gameSprite, new Vector2(64, 416), new Rectangle(0, 912, 32, 32), Color.White); 
+                _spriteBatch.Draw(gameSprite, new Vector2(64, 416), new Rectangle(0, 912, 32, 32), Color.White);
             }
 
             if (Singleton.Instance.isDig)
             {
-                _spriteBatch.Draw(gameSprite, new Vector2(0, 416), new Rectangle(0, 560, 32, 32), Color.White); 
+                _spriteBatch.Draw(gameSprite, new Vector2(0, 416), new Rectangle(0, 560, 32, 32), Color.White);
             }
 
             if (Singleton.Instance.isColorSight)
@@ -405,11 +365,11 @@ namespace SOMCHAIS_Adventure
 
             if (Singleton.Instance.isSkillDefected)
             {
-                _spriteBatch.Draw(gameSprite, new Vector2(32, 416), new Rectangle(0, 864, 32, 32), Color.White); 
+                _spriteBatch.Draw(gameSprite, new Vector2(32, 416), new Rectangle(0, 864, 32, 32), Color.White);
 
             }
 
-            _spriteBatch.Draw(gameSprite, new Vector2(0, 384), new Rectangle(0, 720, 32, 32), Color.White); 
+            _spriteBatch.Draw(gameSprite, new Vector2(0, 384), new Rectangle(0, 720, 32, 32), Color.White);
             _spriteBatch.DrawString(_font, String.Format("{0}", _gameObjects.OfType<Enemy>().Count()), new Vector2(32, 384), Color.Red);
 
             // own dead count hud
@@ -421,6 +381,13 @@ namespace SOMCHAIS_Adventure
                 _spriteBatch.Draw(gameSprite, new Vector2(0, 0), new Rectangle(64, 912, 64, 32), Color.White);
             }
             #endregion
+
+            // Darw Text When defeat Boss
+            if (Singleton.Instance.isBoss1Dead && Singleton.Instance.levelIndex == 4)
+            {
+                Vector2 iamuPosition = new Vector2(screenWidth / 2, screenHeight / 2);
+                _spriteBatch.DrawString(_font, "I am You From The F U T U R E!!!", iamuPosition, Color.Red, 0, _font.MeasureString("I am You From The F U T U R E!!!") / 2, 2.0f, SpriteEffects.None, 0);
+            }
 
             #region OVERLAY
 
@@ -454,13 +421,11 @@ namespace SOMCHAIS_Adventure
             switch (Singleton.Instance.CurrentGameState)
             {
                 case Singleton.GameState.Tutorial:
-                    
+
                     _spriteBatch.Draw(_tutorials[i], Vector2.Zero, Color.White);
 
                     break;
             }
-
-
 
             if (Singleton.Instance.CurrentGameState == Singleton.GameState.GameWin)
             {
@@ -470,7 +435,7 @@ namespace SOMCHAIS_Adventure
             _spriteBatch.End();
 
             _spriteBatch.Begin();
-            
+
             // Display Overlay Scene
             if (Singleton.Instance.CurrentGameState == Singleton.GameState.GameOver)
             {
@@ -495,13 +460,6 @@ namespace SOMCHAIS_Adventure
 
             // Render the current time
             _spriteBatch.DrawString(_font, currentTime.ToString(@"hh\:mm\:ss"), new Vector2(704, 10), Color.White);
-
-            // Darw Text When defeat Boss
-            if (Singleton.Instance.isBoss1Dead && Singleton.Instance.levelIndex == 4)
-            {
-                Vector2 iamuPosition = new Vector2(screenWidth / 2, screenHeight / 2);
-                _spriteBatch.DrawString(_font, "I am You From The F U T U R E!!!", iamuPosition, Color.Red, 0, _font.MeasureString("I am You From The F U T U R E!!!") / 2, 2.0f, SpriteEffects.None, 0);
-            }
 
 
             Singleton.Instance.messageLog.Draw(_spriteBatch, gameTime);
@@ -550,7 +508,7 @@ namespace SOMCHAIS_Adventure
             {
                 s.Reset();
             }
-            
+
         }
 
         protected void ResetEnemies()
@@ -579,7 +537,7 @@ namespace SOMCHAIS_Adventure
 
                         _gameObjects.Add(shieldMonster);
                     }
-                    
+
                     break;
                 case 2:
                     {
