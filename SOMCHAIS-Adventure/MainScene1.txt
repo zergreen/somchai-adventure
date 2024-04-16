@@ -124,13 +124,19 @@ namespace SOMCHAIS_Adventure
 
                 case Singleton.GameState.GamePlaying:
 
+                    // OTHER Level Manager
                     switch (levelIndex)
                     {
                         case 3:
                             if (!Singleton.Instance.isBoss1Dead) cameraLerpFactor = 0.01f;
                             break;
+                        case 4:
+                            cameraLerpFactor = 0.1f;
+                            MediaPlayer.Volume = 0f;
+                            break;
                         default:
                             cameraLerpFactor = 0.1f;
+                            MediaPlayer.Volume = 0.1f;
                             break;
                     }
 
@@ -337,7 +343,7 @@ namespace SOMCHAIS_Adventure
             _spriteBatch.Begin();
 
 
-           switch(levelIndex)
+            switch (levelIndex)
             {
                 case 1:
                     if (!Singleton.Instance.isBoss1Dead)
