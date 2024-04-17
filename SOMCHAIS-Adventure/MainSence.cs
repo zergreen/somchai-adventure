@@ -28,7 +28,7 @@ namespace SOMCHAIS_Adventure
 
         private const int numberOfLevels = 5;
 
-        public Texture2D _bg, _endgame, _overlay, _map;
+        public Texture2D _bg, _endgame, _overlay, _map, _titlescreen;
         private Texture2D[] _tutorials;
         int i = 0;
         public Texture2D gameSprite;
@@ -49,6 +49,17 @@ namespace SOMCHAIS_Adventure
         //int menuIndexIsOne = 1;
 
         bool keepEnterOnceTime = false;
+
+        private TextButton _playButton, _tutorialButton, _quitButton;
+
+        //FOR BLINKING TEXT
+        private string _text = "Press Any Key to Start...";
+        private bool _isVisible = true;
+        private double _elapsedTime = 0;
+        private double _blinkInterval = 0.5; // Blink interval in seconds
+
+        private DialogueManager _dialogueManager;
+        private DialogueEntity[] _entities;
 
         public MainSence()
         {
@@ -80,6 +91,7 @@ namespace SOMCHAIS_Adventure
             _endgame = Content.Load<Texture2D>("Overlay/GameEnding");
             _overlay = Content.Load<Texture2D>("Overlay/overlay");
             _map = Content.Load<Texture2D>("Overlay/Map");
+            _titlescreen = Content.Load<Texture2D>("Overlay/TitleScreen");
 
             _tutorials = new Texture2D[10];
 
@@ -105,6 +117,48 @@ namespace SOMCHAIS_Adventure
             // Initialize currentTime
             currentTime = TimeSpan.Zero;
 
+            // Create text buttons
+            _playButton = new TextButton("Play", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Play").X / 2, GraphicsDevice.Viewport.Height / 2 - _font.MeasureString("Play").Y * 1.5f), _font);
+            _tutorialButton = new TextButton("Tutorial", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Tutorial").X / 2, GraphicsDevice.Viewport.Height / 2), _font);
+            _quitButton = new TextButton("Quit", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Quit").X / 2, GraphicsDevice.Viewport.Height / 2 + _font.MeasureString("Quit").Y * 1.5f), _font);
+
+            #region DIALOGUE
+            // Create dialogue entities
+            _entities = new DialogueEntity[]
+            {
+                new DialogueEntity("Character A", new string[]
+                {
+                    "Hello there!",
+                    "Welcome to my dialogue system. abcdefghightmnopqrstuvwxyz abcdefghightm nopqrstuvwxyz abcdefghightmnopqrstuvwxyz",
+                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley ",
+                    "This is line 4.",
+                    "And this is line 5."
+                }),
+                new DialogueEntity("Character B", new string[]
+                {
+                    "Hi, I'm Character B!",
+                    "I have different dialogue lines.",
+                    "This is my third line.",
+                    "And this is my fourth line.",
+                    "Last line for Character B."
+                }),
+                new DialogueEntity("Character C", new string[]
+                {
+                    "Hello, I'm Character C.",
+                    "My dialogue is shorter.",
+                    "That's it for me!"
+                })
+            };
+        
+            Texture2D dialogueBoxTexture = Content.Load<Texture2D>("Overlay/DialogueBox");
+
+            Rectangle dialogueBox = new Rectangle(10, GraphicsDevice.Viewport.Height - 100, GraphicsDevice.Viewport.Width - 20, 90);
+            _dialogueManager = new DialogueManager(_font, dialogueBox, dialogueBoxTexture);
+        
+
+
+        #endregion
+
             LoadNextLevel();
             Reset();
         }
@@ -114,13 +168,77 @@ namespace SOMCHAIS_Adventure
             Singleton.Instance.CurrentKey = Keyboard.GetState();
             _numObject = _gameObjects.Count;
 
+            MouseState mouseState = Mouse.GetState();
+            Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
+
+            _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+            #region DIALOGUE
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            {
+                _dialogueManager.SetCurrentEntity(_entities[0]);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.B) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            {
+                _dialogueManager.SetCurrentEntity(_entities[1]);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.C) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            {
+                _dialogueManager.SetCurrentEntity(_entities[2]);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.S) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            {
+                _dialogueManager.CloseDialogueBox();
+            }
+
+            _dialogueManager.Update(gameTime);
+            #endregion
+
             switch (Singleton.Instance.CurrentGameState)
             {
                 case Singleton.GameState.StartNewLife:
+
                     Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
                     break;
 
+                case Singleton.GameState.TitleScreen:
+                    if (!Singleton.Instance.CurrentKey.Equals(Singleton.Instance.PreviousKey) && Singleton.Instance.CurrentKey.GetPressedKeys().Length > 0)
+                    {
+                        Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
+                    }
+
+                    // BLINKING TEXT
+                    if (_elapsedTime >= _blinkInterval)
+                    {
+                        _isVisible = !_isVisible;
+                        _elapsedTime = 0;
+                    }
+
+                    //BUTTON HANDLE
+                    _playButton.Update(mousePosition);
+                    _tutorialButton.Update(mousePosition);
+                    _quitButton.Update(mousePosition);
+
+                    // Check for mouse click
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        if (_playButton.IsHovering)
+                        {
+                            Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
+                        }
+                        else if (_tutorialButton.IsHovering)
+                        {
+                            Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
+                        }
+                        else if (_quitButton.IsHovering)
+                        {
+                            Exit();
+                        }
+                    }
+                    break;
+
                 case Singleton.GameState.GamePlaying:
+
                     // Update the current time
                     currentTime += gameTime.ElapsedGameTime;
 
@@ -170,10 +288,10 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.GameOver;
                     }
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-                    {
-                        Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
-                    }
+                    //if (Keyboard.GetState().IsKeyDown(Keys.T) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    //{
+                    //    Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
+                    //}
 
                     // UPDATE: Tiles Level
                     Singleton.Instance.level.Update();
@@ -195,7 +313,7 @@ namespace SOMCHAIS_Adventure
                     if (Keyboard.GetState().IsKeyDown(Keys.Escape) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
                         keepEnterOnceTime = true;
-                        Singleton.Instance.CurrentGameState = Singleton.GameState.GamePlaying;
+                        Singleton.Instance.CurrentGameState = Singleton.GameState.TitleScreen;
                     }
                     if (Keyboard.GetState().IsKeyDown(Keys.Left) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
@@ -209,6 +327,10 @@ namespace SOMCHAIS_Adventure
                         currentMenuIndex = Math.Min(9, currentMenuIndex + 1);
                         i = currentMenuIndex;
                     }
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    //{
+                    //    Singleton.Instance.CurrentGameState = Singleton.GameState.TitleScreen;
+                    //}
                     break;
 
                 case Singleton.GameState.GameWin:
@@ -273,6 +395,11 @@ namespace SOMCHAIS_Adventure
             {
                 Singleton.Instance.tick++;
                 if (Singleton.Instance.tick > 2) Singleton.Instance.tick = 0;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            {
+                Singleton.Instance.CurrentGameState = Singleton.GameState.TitleScreen;
             }
 
             Singleton.Instance.PreviousKey = Singleton.Instance.CurrentKey;
@@ -461,6 +588,24 @@ namespace SOMCHAIS_Adventure
             // Render the current time
             _spriteBatch.DrawString(_font, currentTime.ToString(@"hh\:mm\:ss"), new Vector2(704, 10), Color.White);
 
+            // TITLE SCREEN OVERLAY
+            if (Singleton.Instance.CurrentGameState == Singleton.GameState.TitleScreen)
+            {
+                _spriteBatch.Draw(_titlescreen, Vector2.Zero, Color.White);
+
+                if (_isVisible)
+                {
+                    //_spriteBatch.DrawString(_font, _text, new Vector2(screenWidth / 2, screenHeight / 2), Color.Yellow);
+                    _spriteBatch.DrawString(_font, _text, new Vector2(Singleton.SCREENWIDTH / 2 - (_font.MeasureString(_text).X) / 2, Singleton.SCREENHEIGHT / 4), Color.Yellow);
+                }
+
+                // Draw text buttons
+                _playButton.Draw(_spriteBatch, Color.White, Color.Yellow);
+                _tutorialButton.Draw(_spriteBatch, Color.White, Color.Yellow);
+                _quitButton.Draw(_spriteBatch, Color.White, Color.Yellow);
+            }
+
+            _dialogueManager.Draw(_spriteBatch);
 
             Singleton.Instance.messageLog.Draw(_spriteBatch, gameTime);
 
@@ -473,11 +618,21 @@ namespace SOMCHAIS_Adventure
             base.Draw(gameTime);
         }
 
+        bool istemp = false;
+
         #region RESET & RESET_ENEMY
         protected void Reset()
         {
+            if(!istemp)
+            {
+                Singleton.Instance.CurrentGameState = Singleton.GameState.TitleScreen;
+                istemp = true;
+            }
+            else
+            {
+                Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
+            }
             //Reset Value to Initialize Value
-            Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
 
             SoundEffect shotSound = this.Content.Load<SoundEffect>("Sounds/PlayerShot");
 
@@ -796,6 +951,5 @@ namespace SOMCHAIS_Adventure
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
                 Singleton.Instance.level = new TileBuilder(Services, fileStream);
         }
-
     }
 }

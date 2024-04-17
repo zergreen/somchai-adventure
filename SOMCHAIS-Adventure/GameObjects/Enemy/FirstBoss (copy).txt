@@ -1,0 +1,219 @@
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SOMCHAIS_Adventure;
+using System.Collections.Generic;
+
+namespace SOMCHAISAdventure.GameObjects
+{
+    internal class FirstBoss : Enemy
+    {
+        public Bullet bullet;
+        public float fireTimer = 0f;
+
+        private float delayInvincible = 0f;
+        public bool isInvincible = true;
+
+        public enum Direction
+        {
+            Left,
+            Right
+        }
+        public Direction MovingDirection;
+
+        public float Speed;
+        public float MovedDistance;
+
+        private Vector2 PositionHud;
+
+        public Vector2 GuardPosition { get; set; }
+        public float GuardRadius { get; set; }
+
+        private Random random = new Random();
+        public Vector2 WanderCenter { get; set; }
+        public float WanderRadius { get; set; }
+        private Vector2 wanderTarget;
+
+        public FirstBoss(Texture2D texture) : base(texture)
+        {
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(Singleton.Instance.font, String.Format("{0}", Life), PositionHud, Color.Red);
+
+            if (MovingDirection == Direction.Left)
+            {
+                spriteBatch.Draw(_texture, Position, Viewport, Color.White);
+            }
+            else
+            {
+                spriteBatch.Draw(_texture, Position, Viewport, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0f);
+            }
+            base.Draw(spriteBatch);
+        }
+
+        public override void Reset()
+        {
+            Life = 10;
+            MovedDistance = 0;
+            Speed = 250;
+            MovingDirection = Direction.Left;
+
+            GuardPosition = new Vector2(1159, 1119);
+            GuardRadius = 200f;
+
+            wanderTarget = new Vector2(1159, 1119);
+            WanderRadius = 10f;
+
+            base.Reset();
+        }
+
+        public override void Update(GameTime gameTime, List<GameObject> gameObjects)
+        {
+            PositionHud.X = Position.X + 16;
+            PositionHud.Y = Position.Y - 16;
+
+            WanderCenter = Singleton.Instance.Player.Position;
+
+            if (Life <= 0)
+            {
+                IsActive = false;
+
+                Singleton.Instance.isBoss1Dead = true;
+            }
+
+            delayInvincible += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // delay invicible for 10 second
+            if (delayInvincible >= 10)
+            {
+                delayInvincible = 0f;
+                isInvincible = !isInvincible;
+                if (isInvincible)
+                {
+                    Viewport = new Rectangle(0, 608, 47, 48);
+                }
+                else
+                {
+                    Viewport = new Rectangle(0, 348, 32, 36);
+                }
+            }
+
+            // Calculate the direction vector from the enemy to the player
+            Vector2 direction = Singleton.Instance.Player.Position - Position;
+
+            float distance = direction.Length();
+
+            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector2 movement;
+
+            switch (Life)
+            {
+                
+                case 10:
+
+                    // Normalize the direction vector to get a unit vector
+                    direction.Normalize();
+
+                    // Reference vector pointing to the right (assuming right is (1,0))
+                    Vector2 rightReference = new Vector2(1, 0);
+
+                    // Calculate the dot product of direction and rightReference
+                    float dotProduct = Vector2.Dot(direction, rightReference);
+
+                    // Determine the side
+                    if (dotProduct > 0)
+                    {
+                        // Player is on the right side of the enemy
+                        MovingDirection = Direction.Right;
+                    }
+                    else if (dotProduct < 0)
+                    {
+                        // Player is on the left side of the enemy
+                        MovingDirection = Direction.Left;
+                    }
+
+                    // Set the velocity based on the direction and speed
+                    Velocity = direction * Speed;
+                    bullet.Velocity = direction * 100;
+
+                    fireTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                    if (fireTimer >= 2f)
+                    {
+                        var newBullet = bullet.Clone() as Bullet;
+                        newBullet.Position = new Vector2(Rectangle.Width / 2 + Position.X - newBullet.Rectangle.Width / 2, Position.Y);
+                        newBullet.Reset();
+                        gameObjects.Add(newBullet);
+                        fireTimer = 0f;
+                    }
+
+                    // Update the position based on the velocity and elapsed time
+                    Position += Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    break;
+
+                case 5:
+                    const float preferredDistance = 200; // Adjust this value to change the desired distance
+
+                   
+
+                    if (distance < preferredDistance)
+                    {
+                        // Move away from the player
+                        direction.Normalize();
+                        movement = -direction * Speed * elapsedSeconds;
+                        Position += movement;
+                    }
+                    else if (distance > preferredDistance)
+                    {
+                        // Move towards the player
+                        direction.Normalize();
+                        movement = direction * Speed * elapsedSeconds;
+                        Position += movement;
+                    }
+                    break;
+
+                case 3:
+
+
+                    if (distance < GuardRadius)
+                    {
+                        // Player is within the guarded area, chase the player
+                        direction.Normalize();
+                        movement = direction * Speed * elapsedSeconds;
+                        Position += movement;
+                    }
+                    else
+                    {
+                        // Player is outside the guarded area, return to the guard position
+                        direction = GuardPosition - Position;
+                        direction.Normalize();
+                        movement = direction * Speed * elapsedSeconds;
+                        Position += movement;
+                    }
+                    break;
+
+                case 7:
+                    direction = wanderTarget - Position;
+                    distance = direction.Length();
+
+                    if (distance < 10) // Adjust this value to change the wander target detection radius
+                    {
+                        // Reached the current wander target, generate a new one
+                        wanderTarget = WanderCenter + new Vector2(
+                            (float)random.NextDouble() * WanderRadius * 2 - WanderRadius,
+                            (float)random.NextDouble() * WanderRadius * 2 - WanderRadius);
+                    }
+
+                    direction.Normalize();
+                    movement = direction * Speed * elapsedSeconds;
+                    Position += movement;
+                    break;
+            }
+
+            base.Update(gameTime, gameObjects);
+        }
+    }
+}

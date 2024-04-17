@@ -24,6 +24,7 @@ namespace SOMCHAIS_Adventure
             GameOver,
             Tutorial,
             GameWin,
+            TitleScreen,
         }
 
         public GameState CurrentGameState;
