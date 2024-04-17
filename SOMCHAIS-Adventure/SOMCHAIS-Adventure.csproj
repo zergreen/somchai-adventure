@@ -16,6 +16,7 @@
     <None Remove="GameObjects\Enemy\" />
     <None Remove="GameObjects\Tiles\" />
     <None Remove="Content\Overlay\" />
+    <None Remove="TextHandler\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
@@ -29,6 +30,7 @@
     <Folder Include="GameObjects\Enemy\" />
     <Folder Include="GameObjects\Tiles\" />
     <Folder Include="Content\Overlay\" />
+    <Folder Include="TextHandler\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

@@ -155,12 +155,9 @@ namespace SOMCHAIS_Adventure
         
             Texture2D dialogueBoxTexture = Content.Load<Texture2D>("Overlay/DialogueBox");
 
-            Rectangle dialogueBox = new Rectangle(10, GraphicsDevice.Viewport.Height - 100, GraphicsDevice.Viewport.Width - 20, 90);
+            Rectangle dialogueBox = new Rectangle(10, Singleton.SCREENHEIGHT - 100, Singleton.SCREENWIDTH - 20, 90);
             _dialogueManager = new DialogueManager(_font, dialogueBox, dialogueBoxTexture);
-        
-
-
-        #endregion
+            #endregion
 
             LoadNextLevel();
             Reset();
@@ -369,7 +366,6 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
                     }
                     break;
-
             }
 
             // Debug Zone
@@ -446,6 +442,7 @@ namespace SOMCHAIS_Adventure
 
             _spriteBatch.Begin(samplerState: SamplerState.PointWrap, transformMatrix: m);
 
+            
             // DRAW: Tiles Level
             Singleton.Instance.level.Draw(_spriteBatch);
 
@@ -460,6 +457,7 @@ namespace SOMCHAIS_Adventure
 
             _spriteBatch.Begin();
 
+            #region PLAYER CHALENGE VIEW
             switch (levelIndex)
             {
                 case 1: //CAVE FOLLOW On LEVEL1
@@ -469,6 +467,7 @@ namespace SOMCHAIS_Adventure
                     }
                     break;
             }
+            #endregion
 
             #region PLAYER DISPLAY
 
