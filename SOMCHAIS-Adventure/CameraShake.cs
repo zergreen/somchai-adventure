@@ -6,8 +6,8 @@ namespace SOMCHAISAdventure
 {
     class CameraShake
     {
-        private bool isShakingEnabled;
-        private bool isShaking;
+        public bool isShakingEnabled;
+        public bool isShaking;
         private float shakeTime;
         private float shakeDuration;
         private Vector2 shakeAmount;
@@ -60,7 +60,6 @@ namespace SOMCHAISAdventure
 
         public void ToggleShake(GameTime gameTime)
         {
-            Singleton.Instance.messageLog.AddMessage("" + isShakingEnabled, gameTime);
             isShakingEnabled = !isShakingEnabled;
             if (isShakingEnabled)
             {

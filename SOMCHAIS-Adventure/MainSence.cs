@@ -65,8 +65,6 @@ namespace SOMCHAIS_Adventure
 
         private CameraShake cameraShake;
 
-
-
         public MainSence()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -259,12 +257,15 @@ namespace SOMCHAIS_Adventure
 
                 case Singleton.GameState.GamePlaying:
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.U) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    if ((!Singleton.Instance.isBoss1Dead && levelIndex == 4 ))
                     {
                         cameraShake.ToggleShake(gameTime);
+                        cameraShake.Update(gameTime, ref cameraPosition);
                     }
-
-                    cameraShake.Update(gameTime, ref cameraPosition); 
+                    else
+                    {
+                        cameraShake.isShaking = false;
+                    }
 
                     // Update the current time
                     currentTime += gameTime.ElapsedGameTime;
