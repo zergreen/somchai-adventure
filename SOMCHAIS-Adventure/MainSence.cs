@@ -174,19 +174,19 @@ namespace SOMCHAIS_Adventure
             _numObject = _gameObjects.Count;
 
             #region DIALOGUE
-            if (Keyboard.GetState().IsKeyDown(Keys.A) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[0]);
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.B) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            else if (Keyboard.GetState().IsKeyDown(Keys.D2) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[1]);
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.C) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            else if (Keyboard.GetState().IsKeyDown(Keys.D3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[2]);
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.S) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            else if (Keyboard.GetState().IsKeyDown(Keys.D0) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.CloseDialogueBox();
             }
@@ -300,6 +300,8 @@ namespace SOMCHAIS_Adventure
                             }
                             Reset();
                         }
+                        else { Singleton.Instance.messageLog.AddMessage("[GUIDE] Kill all Enemy on current level", gameTime); }
+                        
                     }
 
                     // Warp to Level 1 When Aquire SkillDefected
