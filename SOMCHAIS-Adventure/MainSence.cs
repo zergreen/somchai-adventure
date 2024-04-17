@@ -228,8 +228,6 @@ namespace SOMCHAIS_Adventure
                     mouseState = Mouse.GetState();
                     mousePosition = new Vector2(mouseState.X, mouseState.Y);
 
-                    
-
                     //BUTTON HANDLE
                     _playButton.Update(mousePosition);
                     _tutorialButton.Update(mousePosition);
@@ -261,30 +259,12 @@ namespace SOMCHAIS_Adventure
 
                 case Singleton.GameState.GamePlaying:
 
-                    /*if (Keyboard.GetState().IsKeyDown(Keys.U) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-                    {
-                        isShakingEnabled = !isShakingEnabled;
-                    }
-
-                    if (isShakingEnabled)
-                    {
-                        isShaking = true;
-                    }
-
-                    ShakeCamera(gameTime); */
-
                     if (Keyboard.GetState().IsKeyDown(Keys.U) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                     {
                         cameraShake.ToggleShake(gameTime);
                     }
 
                     cameraShake.Update(gameTime, ref cameraPosition); 
-
-                    /*
-                    bool isUKeyPressed = Keyboard.GetState().IsKeyDown(Keys.U);
-                    cameraShake.ToggleShake(isUKeyPressed);
-
-                    cameraShake.Update(gameTime, ref cameraPosition); */
 
                     // Update the current time
                     currentTime += gameTime.ElapsedGameTime;
@@ -1034,50 +1014,6 @@ namespace SOMCHAIS_Adventure
                 Singleton.Instance.level = new TileBuilder(Services, fileStream);
         }
 
-        /*
-        private bool isShaking = false;
-        private float shakeTime = 0.25f; // Duration of the shake in seconds
-        private float shakeDuration = 0f; // Time elapsed since the shake started
-        private Vector2 shakeAmount = new Vector2(10, 10); // Magnitude of the shake
-        private Random random = new Random();
-        private bool isShakingEnabled = false;
-
-        private void ShakeCamera(GameTime gameTime)
-        {
-            if (isShaking)
-            {
-                shakeDuration += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (shakeDuration >= shakeTime)
-                {
-                    isShaking = false;
-                    shakeDuration = 0f;
-                }
-                else
-                {
-                    // Calculate the camera offset based on the shake amount and elapsed time
-                    float t = shakeDuration / shakeTime;
-                    float damper = 2.0f - SmoothStep(0, 1, t);
-                    Vector2 offset = new Vector2(
-                        (float)random.NextDouble() * shakeAmount.X * damper,
-                        (float)random.NextDouble() * shakeAmount.Y * damper
-                    );
-
-                    // Apply the offset to the camera position
-                    cameraPosition += offset;
-                }
-            }
-        }
-
-        private static float SmoothStep(float edge0, float edge1, float x)
-        {
-            x = Clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
-            return x * x * (3.0f - 2.0f * x);
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            return Math.Max(min, Math.Min(max, value));
-        } */
+        
     }
 }
