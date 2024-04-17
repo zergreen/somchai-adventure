@@ -52,7 +52,7 @@ namespace SOMCHAIS_Adventure
 
         MouseState mouseState;
         Vector2 mousePosition;
-        private TextButton _playButton, _tutorialButton, _quitButton;
+        private TextButton _playButton, _tutorialButton, _quitButton, _newGameButton;
 
         //FOR BLINKING TEXT
         private string _text = "Press Any Key to Start...";
@@ -120,10 +120,15 @@ namespace SOMCHAIS_Adventure
             // Initialize currentTime
             currentTime = TimeSpan.Zero;
 
+            // Calculate the vertical spacing between buttons
+            float verticalSpacing = _font.MeasureString("Play").Y * 1.5f;
+
             // Create text buttons
-            _playButton = new TextButton("Play", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Play").X / 2, GraphicsDevice.Viewport.Height / 2 - _font.MeasureString("Play").Y * 1.5f), _font);
-            _tutorialButton = new TextButton("Tutorial", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Tutorial").X / 2, GraphicsDevice.Viewport.Height / 2), _font);
-            _quitButton = new TextButton("Quit", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Quit").X / 2, GraphicsDevice.Viewport.Height / 2 + _font.MeasureString("Quit").Y * 1.5f), _font);
+            _newGameButton = new TextButton("New Game", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("New Game").X / 2, GraphicsDevice.Viewport.Height / 2 - verticalSpacing * 1.5f), _font);
+            _playButton = new TextButton("Continue", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Continue").X / 2, GraphicsDevice.Viewport.Height / 2 - verticalSpacing / 2), _font);
+            _tutorialButton = new TextButton("Tutorial", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Tutorial").X / 2, GraphicsDevice.Viewport.Height / 2 + verticalSpacing / 2), _font);
+            _quitButton = new TextButton("Quit", new Vector2(GraphicsDevice.Viewport.Width / 2 - _font.MeasureString("Quit").X / 2, GraphicsDevice.Viewport.Height / 2 + verticalSpacing * 1.5f), _font);
+
 
             #region DIALOGUE
             // Create dialogue entities
@@ -219,6 +224,7 @@ namespace SOMCHAIS_Adventure
                     _playButton.Update(mousePosition);
                     _tutorialButton.Update(mousePosition);
                     _quitButton.Update(mousePosition);
+                    _newGameButton.Update(mousePosition);
 
                     // Check for mouse click
                     if (mouseState.LeftButton == ButtonState.Pressed)
@@ -234,6 +240,11 @@ namespace SOMCHAIS_Adventure
                         else if (_quitButton.IsHovering)
                         {
                             Exit();
+                        }
+                        else if (_newGameButton.IsHovering)
+                        {
+                            Singleton.Instance.CurrentGameState = Singleton.GameState.GameWin;
+
                         }
                     }
                     break;
@@ -358,6 +369,7 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.isDig = false;
                         Singleton.Instance.isSkillDefected = false;
                         Singleton.Instance.tick = 0;
+                        debug = false;
 
                         //Timer = 0;
                         currentTime = TimeSpan.Zero;
@@ -577,7 +589,15 @@ namespace SOMCHAIS_Adventure
 
             if (Singleton.Instance.CurrentGameState == Singleton.GameState.GameWin)
             {
-                _spriteBatch.Draw(_endgame, Vector2.Zero, Color.White); // heart
+                if (Singleton.Instance.isSkillDefected) _spriteBatch.Draw(_endgame, Vector2.Zero, Color.White);
+                else
+                {
+                    _spriteBatch.Draw(_overlay, Vector2.Zero, Color.White);
+                    _spriteBatch.DrawString(_font, "Prepare Process to New Game...", new Vector2(screenWidth / 2 - (_font.MeasureString("Prepare Process to New Game...").X) / 2, screenHeight / 4), Color.Red);
+                    _spriteBatch.DrawString(_font, "Loading...", new Vector2(screenWidth / 2, screenHeight / 2), Color.White, 0, _font.MeasureString("Loading...") / 2, 1.0f, SpriteEffects.None, 0);
+                    _spriteBatch.DrawString(_font, "[DONE] Press any key to start....", new Vector2(screenWidth / 2, (screenHeight / 4) * 3), Color.Yellow, 0, _font.MeasureString("[DONE] Press any key to start....") / 2, 1.0f, SpriteEffects.None, 0);
+
+                }
             }
 
             _spriteBatch.End();
@@ -622,8 +642,9 @@ namespace SOMCHAIS_Adventure
 
                 // Draw text buttons
                 _playButton.Draw(_spriteBatch, Color.White, Color.Yellow);
-                _tutorialButton.Draw(_spriteBatch, Color.White, Color.Yellow);
-                _quitButton.Draw(_spriteBatch, Color.White, Color.Yellow);
+                _tutorialButton.Draw(_spriteBatch, Color.White, Color.Blue);
+                _quitButton.Draw(_spriteBatch, Color.White, Color.Red);
+                _newGameButton.Draw(_spriteBatch, Color.White, Color.Red);
             }
 
             _dialogueManager.Draw(_spriteBatch);
