@@ -50,6 +50,8 @@ namespace SOMCHAIS_Adventure
 
         bool keepEnterOnceTime = false;
 
+        MouseState mouseState;
+        Vector2 mousePosition;
         private TextButton _playButton, _tutorialButton, _quitButton;
 
         //FOR BLINKING TEXT
@@ -168,10 +170,6 @@ namespace SOMCHAIS_Adventure
             Singleton.Instance.CurrentKey = Keyboard.GetState();
             _numObject = _gameObjects.Count;
 
-            MouseState mouseState = Mouse.GetState();
-            Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
-
-            _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
             #region DIALOGUE
             if (Keyboard.GetState().IsKeyDown(Keys.A) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
@@ -206,6 +204,12 @@ namespace SOMCHAIS_Adventure
                     {
                         Singleton.Instance.CurrentGameState = Singleton.GameState.StartNewLife;
                     }
+
+                    // INITIALIZE DATA
+                    mouseState = Mouse.GetState();
+                    mousePosition = new Vector2(mouseState.X, mouseState.Y);
+
+                    _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
                     // BLINKING TEXT
                     if (_elapsedTime >= _blinkInterval)
@@ -288,11 +292,6 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.CurrentGameState = Singleton.GameState.GameOver;
                     }
 
-                    //if (Keyboard.GetState().IsKeyDown(Keys.T) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-                    //{
-                    //    Singleton.Instance.CurrentGameState = Singleton.GameState.Tutorial;
-                    //}
-
                     // UPDATE: Tiles Level
                     Singleton.Instance.level.Update();
 
@@ -327,10 +326,6 @@ namespace SOMCHAIS_Adventure
                         currentMenuIndex = Math.Min(9, currentMenuIndex + 1);
                         i = currentMenuIndex;
                     }
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-                    //{
-                    //    Singleton.Instance.CurrentGameState = Singleton.GameState.TitleScreen;
-                    //}
                     break;
 
                 case Singleton.GameState.GameWin:
