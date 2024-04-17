@@ -28,7 +28,7 @@ namespace SOMCHAIS_Adventure
 
         private const int numberOfLevels = 5;
 
-        public Texture2D _bg, _endgame, _overlay, _map, _titlescreen;
+        public Texture2D _bg, _endgame, _overlay, _map, _titlescreen, _cave_follow;
         private Texture2D[] _tutorials;
         int i = 0;
         public Texture2D gameSprite;
@@ -94,6 +94,7 @@ namespace SOMCHAIS_Adventure
             _overlay = Content.Load<Texture2D>("Overlay/overlay");
             _map = Content.Load<Texture2D>("Overlay/Map");
             _titlescreen = Content.Load<Texture2D>("Overlay/TitleScreen");
+            _cave_follow = Content.Load<Texture2D>("Overlay/cave-follow");
 
             _tutorials = new Texture2D[10];
 
@@ -169,7 +170,6 @@ namespace SOMCHAIS_Adventure
         {
             Singleton.Instance.CurrentKey = Keyboard.GetState();
             _numObject = _gameObjects.Count;
-
 
             #region DIALOGUE
             if (Keyboard.GetState().IsKeyDown(Keys.A) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
@@ -261,6 +261,22 @@ namespace SOMCHAIS_Adventure
                         }
                     }
 
+                    // OTHER Level Manager
+                    switch (levelIndex)
+                    {
+                        case 3:
+                            if (!Singleton.Instance.isBoss1Dead) cameraLerpFactor = 0.01f;
+                            break;
+                        case 4:
+                            cameraLerpFactor = 0.1f;
+                            MediaPlayer.Volume = 0f;
+                            break;
+                        default:
+                            cameraLerpFactor = 0.1f;
+                            MediaPlayer.Volume = 0.1f;
+                            break;
+                    }
+
                     // Level State
                     if (Singleton.Instance.level.ReachedExit)
                     {
@@ -344,6 +360,7 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.isColorSight = false;
                         Singleton.Instance.isDig = false;
                         Singleton.Instance.isSkillDefected = false;
+                        Singleton.Instance.tick = 0;
 
                         //Timer = 0;
                         currentTime = TimeSpan.Zero;
@@ -442,6 +459,16 @@ namespace SOMCHAIS_Adventure
             _spriteBatch.End();
 
             _spriteBatch.Begin();
+
+            switch (levelIndex)
+            {
+                case 1: //CAVE FOLLOW On LEVEL1
+                    if (!Singleton.Instance.isBoss1Dead)
+                    {
+                        _spriteBatch.Draw(_cave_follow, Vector2.Zero, Color.White);
+                    }
+                    break;
+            }
 
             #region PLAYER DISPLAY
 
