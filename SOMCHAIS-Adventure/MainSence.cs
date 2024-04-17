@@ -189,15 +189,15 @@ namespace SOMCHAIS_Adventure
             }
 
             #region DIALOGUE
-            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            if ((levelIndex == 0 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[0]);
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.D2) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            else if ((levelIndex == 1 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D2) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[1]);
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.D3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            else if ((levelIndex == 2 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
                 _dialogueManager.SetCurrentEntity(_entities[2]);
             }
@@ -568,6 +568,8 @@ namespace SOMCHAIS_Adventure
                 _spriteBatch.DrawString(_font, "I am You From The F U T U R E!!!", iamuPosition, Color.Red, 0, _font.MeasureString("I am You From The F U T U R E!!!") / 2, 2.0f, SpriteEffects.None, 0);
             }
 
+            _dialogueManager.Draw(_spriteBatch);
+
             #region OVERLAY
 
             // OUTSIDE OF PLAYER ANNOY
@@ -668,7 +670,6 @@ namespace SOMCHAIS_Adventure
                 _newGameButton.Draw(_spriteBatch, Color.White, Color.Red);
             }
 
-            _dialogueManager.Draw(_spriteBatch);
 
             Singleton.Instance.messageLog.Draw(_spriteBatch, gameTime);
 

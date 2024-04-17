@@ -32,8 +32,16 @@ namespace SOMCHAISAdventure
                 if (keyState.IsKeyDown(Keys.Enter) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
                 {
                     _currentEntity.AdvanceDialogue();
+
+                    //Singleton.Instance.messageLog.AddMessage("" + _currentEntity.CurrentLineIndex, gameTime);
+                }
+
+                if (_currentEntity.CurrentLineIndex >= _currentEntity.DialogueLines.Length)
+                {
+                    CloseDialogueBox();
                 }
             }
+            
         }
 
         public void Draw(SpriteBatch spriteBatch)
