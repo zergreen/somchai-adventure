@@ -63,11 +63,16 @@ namespace SOMCHAIS_Adventure
         private DialogueManager _dialogueManager;
         private DialogueEntity[] _entities;
 
+        private CameraShake cameraShake;
+
+
+
         public MainSence()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
         }
 
         protected override void Initialize()
@@ -78,6 +83,9 @@ namespace SOMCHAIS_Adventure
             _graphics.ApplyChanges();
 
             _gameObjects = new List<GameObject>();
+
+            cameraShake = new CameraShake(shakeTime: 10f, shakeAmount: new Vector2(10, 10));
+
 
             base.Initialize();
         }
@@ -173,6 +181,15 @@ namespace SOMCHAIS_Adventure
             Singleton.Instance.CurrentKey = Keyboard.GetState();
             _numObject = _gameObjects.Count;
 
+            _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+            // BLINKING TEXT
+            if (_elapsedTime >= _blinkInterval)
+            {
+                _isVisible = !_isVisible;
+                _elapsedTime = 0;
+            }
+
             #region DIALOGUE
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
             {
@@ -211,14 +228,7 @@ namespace SOMCHAIS_Adventure
                     mouseState = Mouse.GetState();
                     mousePosition = new Vector2(mouseState.X, mouseState.Y);
 
-                    _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
-
-                    // BLINKING TEXT
-                    if (_elapsedTime >= _blinkInterval)
-                    {
-                        _isVisible = !_isVisible;
-                        _elapsedTime = 0;
-                    }
+                    
 
                     //BUTTON HANDLE
                     _playButton.Update(mousePosition);
@@ -250,6 +260,31 @@ namespace SOMCHAIS_Adventure
                     break;
 
                 case Singleton.GameState.GamePlaying:
+
+                    /*if (Keyboard.GetState().IsKeyDown(Keys.U) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        isShakingEnabled = !isShakingEnabled;
+                    }
+
+                    if (isShakingEnabled)
+                    {
+                        isShaking = true;
+                    }
+
+                    ShakeCamera(gameTime); */
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.U) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        cameraShake.ToggleShake(gameTime);
+                    }
+
+                    cameraShake.Update(gameTime, ref cameraPosition); 
+
+                    /*
+                    bool isUKeyPressed = Keyboard.GetState().IsKeyDown(Keys.U);
+                    cameraShake.ToggleShake(isUKeyPressed);
+
+                    cameraShake.Update(gameTime, ref cameraPosition); */
 
                     // Update the current time
                     currentTime += gameTime.ElapsedGameTime;
@@ -372,6 +407,7 @@ namespace SOMCHAIS_Adventure
                         Singleton.Instance.isSkillDefected = false;
                         Singleton.Instance.tick = 0;
                         debug = false;
+                        isMap = false;
 
                         //Timer = 0;
                         currentTime = TimeSpan.Zero;
@@ -597,8 +633,10 @@ namespace SOMCHAIS_Adventure
                     _spriteBatch.Draw(_overlay, Vector2.Zero, Color.White);
                     _spriteBatch.DrawString(_font, "Prepare Process to New Game...", new Vector2(screenWidth / 2 - (_font.MeasureString("Prepare Process to New Game...").X) / 2, screenHeight / 4), Color.Red);
                     _spriteBatch.DrawString(_font, "Loading...", new Vector2(screenWidth / 2, screenHeight / 2), Color.White, 0, _font.MeasureString("Loading...") / 2, 1.0f, SpriteEffects.None, 0);
-                    _spriteBatch.DrawString(_font, "[DONE] Press any key to start....", new Vector2(screenWidth / 2, (screenHeight / 4) * 3), Color.Yellow, 0, _font.MeasureString("[DONE] Press any key to start....") / 2, 1.0f, SpriteEffects.None, 0);
-
+                    if (_isVisible)
+                    {
+                        _spriteBatch.DrawString(_font, "[DONE] Press any key to start....", new Vector2(screenWidth / 2, (screenHeight / 4) * 3), Color.Yellow, 0, _font.MeasureString("[DONE] Press any key to start....") / 2, 1.0f, SpriteEffects.None, 0);
+                    }
                 }
             }
 
@@ -995,5 +1033,51 @@ namespace SOMCHAIS_Adventure
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
                 Singleton.Instance.level = new TileBuilder(Services, fileStream);
         }
+
+        /*
+        private bool isShaking = false;
+        private float shakeTime = 0.25f; // Duration of the shake in seconds
+        private float shakeDuration = 0f; // Time elapsed since the shake started
+        private Vector2 shakeAmount = new Vector2(10, 10); // Magnitude of the shake
+        private Random random = new Random();
+        private bool isShakingEnabled = false;
+
+        private void ShakeCamera(GameTime gameTime)
+        {
+            if (isShaking)
+            {
+                shakeDuration += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (shakeDuration >= shakeTime)
+                {
+                    isShaking = false;
+                    shakeDuration = 0f;
+                }
+                else
+                {
+                    // Calculate the camera offset based on the shake amount and elapsed time
+                    float t = shakeDuration / shakeTime;
+                    float damper = 2.0f - SmoothStep(0, 1, t);
+                    Vector2 offset = new Vector2(
+                        (float)random.NextDouble() * shakeAmount.X * damper,
+                        (float)random.NextDouble() * shakeAmount.Y * damper
+                    );
+
+                    // Apply the offset to the camera position
+                    cameraPosition += offset;
+                }
+            }
+        }
+
+        private static float SmoothStep(float edge0, float edge1, float x)
+        {
+            x = Clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+            return x * x * (3.0f - 2.0f * x);
+        }
+
+        private static float Clamp(float value, float min, float max)
+        {
+            return Math.Max(min, Math.Min(max, value));
+        } */
     }
 }
