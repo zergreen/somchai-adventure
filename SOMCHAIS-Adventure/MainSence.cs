@@ -140,27 +140,27 @@ namespace SOMCHAIS_Adventure
             // Create dialogue entities
             _entities = new DialogueEntity[]
             {
-                new DialogueEntity("Character A", new string[]
+                new DialogueEntity("Level1", new string[]
                 {
-                    "Hello there!",
-                    "Welcome to my dialogue system. abcdefghightmnopqrstuvwxyz abcdefghightm nopqrstuvwxyz abcdefghightmnopqrstuvwxyz",
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley ",
-                    "This is line 4.",
-                    "And this is line 5."
+                    "Welcome Backkk, Somchai!!! [PRESS ENTER]",
+                    "I'm The Voice Of God who Help you to clear this game",
+                    "Well well well..., If You want to close my voice [PRESS 0]",
+                    "This is first time you play this game right?",
+                    "Aha..., This game has 5 level. The boss is live in level 5",
+                    "If you want to go to next level. You must kill the all enemy on current level and go to 'RED SHRINE'",
+                    "If you want to know [SHORTCUT KEY]. Press ESC and Select TUTORIAL Menu",
+                    "Hope you reach to Enjoy this game. Good Luck",
                 }),
-                new DialogueEntity("Character B", new string[]
+                new DialogueEntity("Level2", new string[]
                 {
-                    "Hi, I'm Character B!",
-                    "I have different dialogue lines.",
-                    "This is my third line.",
-                    "And this is my fourth line.",
-                    "Last line for Character B."
+                    "This level is look like C A V E",
+                    "You must to search the all enemy on this area",
                 }),
-                new DialogueEntity("Character C", new string[]
+                new DialogueEntity("Level3", new string[]
                 {
-                    "Hello, I'm Character C.",
-                    "My dialogue is shorter.",
-                    "That's it for me!"
+                    "This level is like Pokemon GYM Warp",
+                    "Is Annoy If you not remember the door",
+                    "[HINT] You must look on top right door and try to go for exit this level"
                 })
             };
         
@@ -188,26 +188,35 @@ namespace SOMCHAIS_Adventure
                 _elapsedTime = 0;
             }
 
-            #region DIALOGUE
-            if ((levelIndex == 0 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+            switch (!Singleton.Instance.isBoss1Dead)
             {
-                _dialogueManager.SetCurrentEntity(_entities[0]);
-            }
-            else if ((levelIndex == 1 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D2) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-            {
-                _dialogueManager.SetCurrentEntity(_entities[1]);
-            }
-            else if ((levelIndex == 2 && !Singleton.Instance.isBoss1Dead) || Keyboard.GetState().IsKeyDown(Keys.D3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-            {
-                _dialogueManager.SetCurrentEntity(_entities[2]);
-            }
-            else if (Keyboard.GetState().IsKeyDown(Keys.D0) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
-            {
-                _dialogueManager.CloseDialogueBox();
-            }
+                case true:
+                    #region DIALOGUE
+                    if ((levelIndex == 0 ) || Keyboard.GetState().IsKeyDown(Keys.D1) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        _dialogueManager.SetCurrentEntity(_entities[0]);
+                    }
+                    else if ((levelIndex == 1 ) || Keyboard.GetState().IsKeyDown(Keys.D2) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        _dialogueManager.SetCurrentEntity(_entities[1]);
+                    }
+                    else if ((levelIndex == 2 ) || Keyboard.GetState().IsKeyDown(Keys.D3) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        _dialogueManager.SetCurrentEntity(_entities[2]);
+                    }
+                    if (levelIndex == 3)
+                    {
+                        _dialogueManager.CloseDialogueBox();
+                    }
+                    else if (Keyboard.GetState().IsKeyDown(Keys.D0) && Singleton.Instance.CurrentKey != Singleton.Instance.PreviousKey)
+                    {
+                        _dialogueManager.CloseDialogueBox();
+                    }
 
-            _dialogueManager.Update(gameTime);
-            #endregion
+                    _dialogueManager.Update(gameTime);
+                    #endregion
+                    break;
+            }
 
             switch (Singleton.Instance.CurrentGameState)
             {
